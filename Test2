@@ -1,0 +1,6 @@
+from gpiozero import Motor
+
+motor = Motor(17,18)
+motor.forward()
+input("Presser ENTRER pour arrêter")
+motor.stop()
