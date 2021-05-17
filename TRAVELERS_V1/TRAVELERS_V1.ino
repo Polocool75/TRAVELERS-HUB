@@ -10,26 +10,26 @@ const int dead = 50; // Agrandissement de la zone morte
  * 3    6
  *  
  */
-const int Motor1A = 12;
-const int Motor1R = 13;
+const int Motor1A = 15;
+const int Motor1R = 4;
 
-const int Motor2A = 14;
-const int Motor2R = 27;
+const int Motor2A = 13;
+const int Motor2R = 12;
 
 const int Motor3A = 26;
 const int Motor3R = 25;
 
-const int Motor4A = 33;
-const int Motor4R = 32;
+const int Motor4A = 5;
+const int Motor4R = 19;
 
-const int Motor5A = 15;
-const int Motor5R = 4;
+const int Motor5A = 14;
+const int Motor5R = 27;
 
-const int Motor6A = 19;
-const int Motor6R = 5;
+const int Motor6A = 33;
+const int Motor6R = 32;
 
 const int freq = 500; //fq du PWM
-const int resolution = 8; Resolution (8 octets = 256 valeurs prenables pour le PWM
+const int resolution = 8; //Resolution (8 octets = 256 valeurs prenables pour le PWM
 
 void setup() 
 {
@@ -46,8 +46,8 @@ void setup()
   ledcAttachPin(Motor1R,2);
   ledcAttachPin(Motor2A,3);
   ledcAttachPin(Motor2R,4); 
-  ledcAttachPin(Motor3R,5);
-  ledcAttachPin(Motor3A,6);
+  ledcAttachPin(Motor3A,5);
+  ledcAttachPin(Motor3R,6);
   ledcAttachPin(Motor4A,7);
   ledcAttachPin(Motor4R,8);
   ledcAttachPin(Motor5A,9);
