@@ -6,7 +6,7 @@ const int dead = 50; // Agrandissement de la zone morte
 const int Motor1A = 12;
 const int Motor1R = 13;
 
-const int Motor2A = 14; //SALUTSALUT
+const int Motor2A = 14;
 const int Motor2R = 27;
 
 const int Motor3A = 26;
