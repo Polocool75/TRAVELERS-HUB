@@ -134,13 +134,11 @@ if (PS4.isConnected())
     
     if(RStick<=-dead || RStick >= dead)
     {
-      Serial.println(RStick);
-      Serial.println(R_A);
+      Serial.println("testR " + int(RStick));
     }
     if(LStick<=-dead || LStick >= dead)
     {
-      Serial.println(LStick);
-      Serial.println(L_A);
+      Serial.println("testL " + int(LStick));
     }
     
     Move(LStick,RStick,L_A,R_A);
