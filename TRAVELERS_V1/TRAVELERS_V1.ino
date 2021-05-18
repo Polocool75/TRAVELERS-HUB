@@ -5,9 +5,9 @@ const int dead = 50; // Agrandissement de la zone morte
 //Pour les moteur, la numérotation suit ce schéma
 /* 
  * AVANT
- * 1    4
- * 2    5
- * 3    6
+ * 1   4
+ * 2   5
+ * 3   6
  *  
  */
 const int Motor1A = 15;
@@ -63,10 +63,15 @@ void Move(int gauche, int droite, bool L_A, bool R_A)
   //Une ou deux roues en mouvement
   if((gauche<=-dead || gauche >= dead) || (droite<= -dead ||droite >= dead))
   {
-    int valueR = map(abs(droite),0,129,0,255);
-    int valueL= map(abs(gauche),0,129,0,255);
-    Serial.println(valueR);
-    Serial.println(valueL);
+    int valueR =0;
+    int valueL =0;
+    if((droite<= -dead ||droite >= dead))
+      valueR =map(abs(droite),0,128,0,255);
+    if(gauche<=-dead || gauche >= dead)
+      valueL= map(abs(gauche),0,129,0,255);
+      
+    //Serial.println(valueR);
+    //Serial.println(valueL);
     
     if(L_A)
      {
@@ -99,11 +104,11 @@ void Move(int gauche, int droite, bool L_A, bool R_A)
      else
      {
         ledcWrite(7,0);
-        ledcWrite(8,valueL);
+        ledcWrite(8,valueR);
         ledcWrite(9,0);
-        ledcWrite(10,valueL);
+        ledcWrite(10,valueR);
         ledcWrite(11,0);
-        ledcWrite(12,valueL);
+        ledcWrite(12,valueR);
      }
   }
   else
@@ -131,16 +136,17 @@ if (PS4.isConnected())
     bool R_A = PS4.RStickY()>0;
     int LStick = PS4.LStickY();
     bool L_A = PS4.LStickY()>0;
-    
+
+    /*
     if(RStick<=-dead || RStick >= dead)
     {
-      Serial.println("testR " + int(RStick));
+      //Serial.println(RStick);
     }
     if(LStick<=-dead || LStick >= dead)
     {
-      Serial.println("testL " + int(LStick));
+      //Serial.println(LStick);
     }
-    
+    */
     Move(LStick,RStick,L_A,R_A);
     
     delay(50);
