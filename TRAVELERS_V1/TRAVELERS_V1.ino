@@ -1,15 +1,25 @@
 #include <PS4Controller.h>
 
-const int dead = 50; // Agrandissement de la zone morte 
 
-//Pour les moteur, la numérotation suit ce schéma
-/* 
- * AVANT
- * 1   4
- * 2   5
- * 3   6
+const int dead = 40; // Agrandissement de la zone morte 
+int r = 50;
+int g = 50;
+int b = 50;
+
+int slow= 0;
+bool carre = false;
+bool triangle = false;
+bool cercle = false;
+
+/* Pour les moteur, la numérotation suit ce schéma 
+ * 
+ *   AVANT
+ *  1    4
+ *  2    5
+ *  3    6
  *  
  */
+ 
 const int Motor1A = 15;
 const int Motor1R = 4;
 
@@ -29,8 +39,7 @@ const int Motor6A = 33;
 const int Motor6R = 32;
 
 const int freq = 500; //fq du PWM
-const int resolution = 8; //Resolution (8 octets = 256 valeurs prenables pour le PWM
-
+const int resolution = 8; //Resolution (8 octets = 256 valeurs prenables pour le PWM)
 void setup() 
 {
   
@@ -39,7 +48,7 @@ void setup()
 
   for(int i= 1; i<=12;i++)
   {
-     ledcSetup(i,freq, resolution); //Le channel 0 aura donc comme fq 5000hz et 8 de résolution
+     ledcSetup(i,freq, resolution); //Le channel 0 aura donc comme fq 5000hz et 8 de résolutio
   }
   
   ledcAttachPin(Motor1A,1);
@@ -56,59 +65,82 @@ void setup()
   ledcAttachPin(Motor6R,12);
 }
 
+void nextRainbowColor() {
+  if (r > 0 && b == 0) {
+    r--;
+    g++;
+  }
+  if (g > 0 && r == 0) {
+    g--;
+    b++;
+  }
+  if (b > 0 && g == 0) {
+    r++;
+    b--;
+  }
+}
+
 void Move(int gauche, int droite, bool L_A, bool R_A)
 {
   if (PS4.isConnected()) 
   {
-  //Une ou deux roues en mouvement
+   
   if((gauche<=-dead || gauche >= dead) || (droite<= -dead ||droite >= dead))
   {
-    int valueR =0;
-    int valueL =0;
-    if((droite<= -dead ||droite >= dead))
-      valueR =map(abs(droite),0,128,0,255);
-    if(gauche<=-dead || gauche >= dead)
-      valueL= map(abs(gauche),0,129,0,255);
-      
-    //Serial.println(valueR);
-    //Serial.println(valueL);
+float coefA=1;
+float coefM=1;
+float coefR=1;    
+    if(!cercle && !triangle && !carre){
+      coefA = cercle ? 1:0.70 ;
+    coefM = triangle ? 1:0.70 ;
+    coefR = carre ? 1:0.70 ;
+    }
     
+    
+    int valueR = 0;
+    int valueL = 0;
+    if((droite<= -dead ||droite >= dead))
+      valueR =min((int)map(abs(droite),0,110,0,255),255);
+    if(gauche<=-dead || gauche >= dead)
+      valueL= min((int)map(abs(gauche),0,110,0,255),255);
+    Serial.println(valueR);
+    Serial.println(valueL);
     if(L_A)
      {
-        ledcWrite(1,valueL);
-        ledcWrite(2,0);
-        ledcWrite(3,valueL);
-        ledcWrite(4,0);
-        ledcWrite(5,valueL);
+        ledcWrite(1,round(valueL*coefA));
+        ledcWrite(2,0); 
+        ledcWrite(3,round(valueL*coefM));
+        ledcWrite(4,0);             
+        ledcWrite(5,round(valueL*coefR));
         ledcWrite(6,0);
      }
      else
      {
         ledcWrite(1,0);
-        ledcWrite(2,valueL);
+        ledcWrite(2,round(valueL*coefA));
         ledcWrite(3,0);
-        ledcWrite(4,valueL);
+        ledcWrite(4,round(valueL*coefM));      
         ledcWrite(5,0);
-        ledcWrite(6,valueL);
+        ledcWrite(6,round(valueL*coefR));
      }
 
      if(R_A)
      {
-        ledcWrite(7,valueR);
+        ledcWrite(7,round(valueR*coefA));
         ledcWrite(8,0);
-        ledcWrite(9,valueR);
-        ledcWrite(10,0);
-        ledcWrite(11,valueR);
+        ledcWrite(9,round(valueR*coefM));
+        ledcWrite(10,0);      
+        ledcWrite(11,round(valueR*coefR));
         ledcWrite(12,0);
      }
      else
      {
         ledcWrite(7,0);
-        ledcWrite(8,valueR);
+        ledcWrite(8,round(valueR*coefA));
         ledcWrite(9,0);
-        ledcWrite(10,valueR);
+        ledcWrite(10,round(valueR*coefM));       
         ledcWrite(11,0);
-        ledcWrite(12,valueR);
+        ledcWrite(12,round(valueR*coefR));
      }
   }
   else
@@ -136,19 +168,39 @@ if (PS4.isConnected())
     bool R_A = PS4.RStickY()>0;
     int LStick = PS4.LStickY();
     bool L_A = PS4.LStickY()>0;
-
-    /*
-    if(RStick<=-dead || RStick >= dead)
+    if(PS4.Square())
     {
-      //Serial.println(RStick);
+      carre = !carre;
+      b = carre ? 210:50;
+      delay(100);
+        
     }
-    if(LStick<=-dead || LStick >= dead)
+    if(PS4.Circle())
     {
-      //Serial.println(LStick);
+      cercle = !cercle;
+      r = cercle ? 210:50;
+      delay(100);
     }
-    */
+    if(PS4.Triangle())
+    {
+      triangle= !triangle;
+      g = triangle ? 210:50;
+      delay(100);
+    }
+    if(triangle && cercle && carre)
+    {
+      triangle=false;
+      carre = false;
+      cercle = false;
+      r=50;
+      g=50;
+      b=50;     
+    }
+    PS4.setLed(r, g, b);
+    PS4.sendToController();
     Move(LStick,RStick,L_A,R_A);
     
     delay(50);
 }
+
 }
