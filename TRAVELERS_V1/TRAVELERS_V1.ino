@@ -65,21 +65,6 @@ void setup()
   ledcAttachPin(Motor6R,12);
 }
 
-void nextRainbowColor() {
-  if (r > 0 && b == 0) {
-    r--;
-    g++;
-  }
-  if (g > 0 && r == 0) {
-    g--;
-    b++;
-  }
-  if (b > 0 && g == 0) {
-    r++;
-    b--;
-  }
-}
-
 void Move(int gauche, int droite, bool L_A, bool R_A)
 {
   if (PS4.isConnected()) 
@@ -103,8 +88,7 @@ float coefR=1;
       valueR =min((int)map(abs(droite),0,110,0,255),255);
     if(gauche<=-dead || gauche >= dead)
       valueL= min((int)map(abs(gauche),0,110,0,255),255);
-    Serial.println(valueR);
-    Serial.println(valueL);
+      
     if(L_A)
      {
         ledcWrite(1,round(valueL*coefA));
