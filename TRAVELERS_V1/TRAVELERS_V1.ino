@@ -1,10 +1,13 @@
 #include <PS4Controller.h>
 
-
 const int dead = 40; // Agrandissement de la zone morte 
 int r = 50;
 int g = 50;
 int b = 50;
+
+float coefA=1;
+float coefM=1;
+float coefR=1;    
 
 int slow= 0;
 bool carre = false;
@@ -19,7 +22,8 @@ bool cercle = false;
  *  3    6
  *  
  */
- 
+
+// Définition des pins de chaque moteur :
 const int Motor1A = 15;
 const int Motor1R = 4;
 
@@ -38,19 +42,19 @@ const int Motor5R = 27;
 const int Motor6A = 33;
 const int Motor6R = 32;
 
-const int freq = 500; //fq du PWM
-const int resolution = 8; //Resolution (8 octets = 256 valeurs prenables pour le PWM)
+const int freq = 500; // Fq du PWM
+const int resolution = 8; // Resolution (8 octets = 256 valeurs prenables pour le PWM)
+
 void setup() 
 {
-  
   Serial.begin(115200);
   PS4.begin("01:01:01:01:01:01");
-
   for(int i= 1; i<=12;i++)
   {
-     ledcSetup(i,freq, resolution); //Le channel 0 aura donc comme fq 5000hz et 8 de résolutio
+     ledcSetup(i,freq, resolution); //Tous les channels auront donc comme fq 5000hz et 8 de résolution
+     //nb: 
   }
-  
+
   ledcAttachPin(Motor1A,1);
   ledcAttachPin(Motor1R,2);
   ledcAttachPin(Motor2A,3);
@@ -72,15 +76,17 @@ void Move(int gauche, int droite, bool L_A, bool R_A)
    
   if((gauche<=-dead || gauche >= dead) || (droite<= -dead ||droite >= dead))
   {
-float coefA=1;
-float coefM=1;
-float coefR=1;    
-    if(!cercle && !triangle && !carre){
-      coefA = cercle ? 1:0.70 ;
-    coefM = triangle ? 1:0.70 ;
-    coefR = carre ? 1:0.70 ;
+    coefA=1;
+    coefM=1;
+    coefR=1;    
+    if(cercle || triangle || carre){
+      coefA = cercle ? 1:0.80 ;
+      coefM = triangle ? 1:0.80 ;
+      coefR = carre ? 1:0.80 ;
     }
-    
+    Serial.println(coefA);
+    Serial.println(coefM);
+    Serial.println(coefR);
     
     int valueR = 0;
     int valueL = 0;
@@ -157,7 +163,6 @@ if (PS4.isConnected())
       carre = !carre;
       b = carre ? 210:50;
       delay(100);
-        
     }
     if(PS4.Circle())
     {
@@ -182,8 +187,7 @@ if (PS4.isConnected())
     }
     PS4.setLed(r, g, b);
     PS4.sendToController();
-    Move(LStick,RStick,L_A,R_A);
-    
+    Move(LStick,RStick,L_A,R_A);    
     delay(50);
 }
 
