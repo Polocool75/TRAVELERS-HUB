@@ -1,5 +1,6 @@
 #include <ESP32_Servo.h> // Bibliothèque pour faire marcher un moteur servo avec un ESP32
-#include<PS4Controller.h> // Bilbliothèque pour connecter la manette PS4
+#include <PS4Controller.h> // Bilbliothèque pour connecter la manette PS4
+
 
 #define MIN_PULSE_LENGTH 1000 // Minimum pulse length in µs
 #define MAX_PULSE_LENGTH 2000 // Maximum pulse length in µs
@@ -14,6 +15,7 @@ int mode = 0; // pour l'instant, mode prendra 2 valeur dans le programme (0: pha
 bool active = false; // Booléen utilisé dans l'initialisation (au niveau de la touche triangle)
 
 void setup() {
+  Serial.begin(9600);
   PS4.begin("03:03:03:03:03:03");// Adresse IMAC de la manette PS4 à connecter, à laisser comme ça
   pinMode(32, OUTPUT); // Pin 32 de l'ESP (je crois c'est un PWM, jsp si ça marche avec tous les pins)
   motA.attach(32, MIN_PULSE_LENGTH, MAX_PULSE_LENGTH); // Le moteur est alors "atttaché" au pin 32 avec un min et un max de pulse
@@ -53,6 +55,7 @@ void loop() {
       int valueR = map(abs(RStick), 0, 129, MIN_PULSE_LENGTH, MAX_PULSE_LENGTH); // On remap les valeurs
       if (R_A) {
         motA.writeMicroseconds(valueR);
+        Serial.println(valueR);
       }
       else
       {
