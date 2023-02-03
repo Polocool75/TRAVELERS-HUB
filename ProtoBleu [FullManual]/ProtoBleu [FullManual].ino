@@ -1,5 +1,18 @@
 #include <PS4Controller.h>
 
+#include <WiFi.h>
+#include <WiFiUdp.h>
+
+const char * networkName = "ntw_TRAVELERS";
+const char * networkPswd = "TRAVELERS";
+const char * udpAddress = "10.3.141.50";
+const int udpPort = 3333;
+
+boolean connected = false;
+
+WiFiUDP udp;
+
+
 const int dead = 40;
 
 const int freq = 500; // Fréquence du PWM
@@ -15,7 +28,9 @@ bool carre = false;
 
 void setup() {
   PS4.begin("02:02:02:02:02:02"); //Lance la connection à la manette PS4 (le paramètre est l'adresse MAC de la manette)
-
+  Serial.begin(115200);
+  connectToWiFi(networkName, networkPswd);
+  
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
   pinMode(14, OUTPUT);
@@ -62,6 +77,13 @@ void loop() {
       delay(100);
     }
     Move(LStick, RStick, L_A, R_A);
+	
+	if(connected){
+    //Send a packet
+    udp.beginPacket(udpAddress,udpPort);
+    udp.printf("Seconds since boot: %u", millis()/1000);
+    udp.endPacket();
+	}
     delay(50);
   }
 }
@@ -110,4 +132,36 @@ void Move(int gauche, int droite, bool L_A, bool R_A)
       ledcWrite(4, 0);
     }
   }
+}
+void connectToWiFi(const char * ssid, const char * pwd){
+  Serial.println("Connecting to WiFi network: " + String(ssid));
+
+  // delete old config
+  WiFi.disconnect(true);
+  //register event handler
+  WiFi.onEvent(WiFiEvent);
+  
+  //Initiate connection
+  WiFi.begin(ssid, pwd);
+
+  Serial.println("Waiting for WIFI connection...");
+}
+
+//wifi event handler
+void WiFiEvent(WiFiEvent_t event){
+    switch(event) {
+      case SYSTEM_EVENT_STA_GOT_IP:
+          //When connected set 
+          Serial.print("WiFi connected! IP address: ");
+          Serial.println(WiFi.localIP());  
+          //initializes the UDP state
+          //This initializes the transfer buffer
+          udp.begin(WiFi.localIP(),udpPort);
+          connected = true;
+          break;
+      case SYSTEM_EVENT_STA_DISCONNECTED:
+          Serial.println("WiFi lost connection");
+          connected = false;
+          break;
+    }
 }
