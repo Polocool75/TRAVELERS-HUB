@@ -77,13 +77,13 @@ void loop() {
       delay(100);
     }
     Move(LStick, RStick, L_A, R_A);
-	
-	if(connected){
+  
+  if(connected){
     //Send a packet
     udp.beginPacket(udpAddress,udpPort);
     udp.printf("Seconds since boot: %u", millis()/1000);
     udp.endPacket();
-	}
+  }
     delay(50);
   }
 }
