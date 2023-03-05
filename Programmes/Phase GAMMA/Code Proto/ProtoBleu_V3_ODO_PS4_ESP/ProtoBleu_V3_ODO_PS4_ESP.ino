@@ -8,11 +8,17 @@ const int dead = 40;
 const int freq = 500;                                      // Fréquence du PWM
 const int resolution = 8;                                  // Resolution (8 octets = 256 valeurs prenables pour le PWM, de 0 à 255)
 
-const int Motor1A = 13;
-const int Motor1R = 12;
+const int Motor1A = 15;
+const int Motor1R = 4;
 
-const int Motor2A = 14;
-const int Motor2R = 27;
+const int Motor2A = 5;
+const int Motor2R = 18;
+
+const int Motor3A = 19;
+const int Motor3R = 21;
+
+const int Motor4A = 17;
+const int Motor4R = 23;
 
 const int enable = 2;
 
@@ -20,7 +26,7 @@ bool carre = false;
 
 //------------------------------- Variables odométrie générales ---------------------------------------------
 
-int nbDeTicks = 20;   // à définir par mesures             // nombre de ticks par tour de l'encodeur
+double nbDeTicks = 341.2;   // à définir par mesures             // nombre de ticks par tour de l'encodeur
 float diametre = 6.5;                                      // diamètre de la roue en cm
 float entraxe = 21;                                        // distance entre les roues en cm
 int incertitude = 1;                                       // nombre de d'appels de la méthode ISR pour le calcul de la vitesse (plus la valeur est petite, plus le bruit de la mesure est important)
@@ -63,9 +69,9 @@ volatile unsigned echActuelInterruptionG = 0;
 volatile unsigned echPrecedentInterruptionG = 0;
 double echDeltaInterruptionG = 0;
 
-int encodeurG = 2;
+int encodeurG = 22;
 
-double frequenceG = 0;
+double frequenceG = 23;
 double Wg = 0;
 double Vg = 0;
 int CG = 0;

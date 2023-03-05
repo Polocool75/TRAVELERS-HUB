@@ -38,7 +38,7 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  delay(300);
   if(receiveFlag == true)
   {
     Serial.println(temp);
