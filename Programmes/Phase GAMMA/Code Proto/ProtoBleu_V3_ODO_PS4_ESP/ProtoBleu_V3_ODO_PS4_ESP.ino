@@ -8,17 +8,17 @@ const int dead = 40;
 const int freq = 500;                                      // Fréquence du PWM
 const int resolution = 8;                                  // Resolution (8 octets = 256 valeurs prenables pour le PWM, de 0 à 255)
 
-const int Motor1A = 15;
-const int Motor1R = 4;
+const int Motor1A = 23;
+const int Motor1R = 22;
 
-const int Motor2A = 5;
-const int Motor2R = 18;
+const int Motor2A = 21;
+const int Motor2R = 19;
 
-const int Motor3A = 19;
-const int Motor3R = 21;
+const int Motor3A = 27;
+const int Motor3R = 13;
 
-const int Motor4A = 17;
-const int Motor4R = 23;
+const int Motor4A = 25;
+const int Motor4R = 26;
 
 const int enable = 2;
 
@@ -50,7 +50,7 @@ volatile unsigned echActuelInterruptionD = 0;              // variables pour la 
 volatile unsigned echPrecedentInterruptionD = 0;
 double echDeltaInterruptionD = 0;
 
-int encodeurD = 3;                                         // pin de l'encodeur  (nous en avons deux par roue techniquement)
+int encodeurD = 18;                                         // pin de l'encodeur  (nous en avons deux par roue techniquement)
 
 double frequenceD = 0;                                     // fréquence d'interruption des roues
 double Wd = 0;                                             // Vitesse angulaire
@@ -69,7 +69,7 @@ volatile unsigned echActuelInterruptionG = 0;
 volatile unsigned echPrecedentInterruptionG = 0;
 double echDeltaInterruptionG = 0;
 
-int encodeurG = 22;
+int encodeurG = 32;
 
 double frequenceG = 23;
 double Wg = 0;
@@ -91,6 +91,10 @@ void setup()
   pinMode(Motor1R, OUTPUT);
   pinMode(Motor2A, OUTPUT);
   pinMode(Motor2R, OUTPUT);
+  pinMode(Motor3A, OUTPUT);
+  pinMode(Motor3R, OUTPUT);
+  pinMode(Motor4A, OUTPUT);
+  pinMode(Motor4R, OUTPUT);
   pinMode(enable, OUTPUT);
 
   // A vérifier pour ça :
@@ -99,7 +103,7 @@ void setup()
 
   digitalWrite(enable, LOW);
 
-  for (int i = 1; i <= 4; i++)
+  for (int i = 1; i <= 8; i++)
   {
     /* Fonctionnement du PWM avec l'ESP32:
        Tout d'abord créer un "programme pré-enregistré" avec ledcSetup([numéro du programme (1 à 16)],[fq du PWM], [résolution du PWM])
@@ -116,6 +120,11 @@ void setup()
   ledcAttachPin(Motor1R, 2);
   ledcAttachPin(Motor2A, 3);
   ledcAttachPin(Motor2R, 4);
+  
+  ledcAttachPin(Motor3A, 5);
+  ledcAttachPin(Motor3R, 6);
+  ledcAttachPin(Motor4A, 7);
+  ledcAttachPin(Motor4R, 8);
 
   attachInterrupt(digitalPinToInterrupt(encodeurD), ISRdroite, FALLING); // ligne pour ajouter une interruption à un pin précisé
   attachInterrupt(digitalPinToInterrupt(encodeurG), ISRgauche, FALLING);
@@ -141,37 +150,38 @@ void loop()
     }
     Move(LStick, RStick, L_A, R_A);
     delay(50);
-  }
-  echActuel = millis();                                  // Temps de la mesure
-  echActuelInterruptionD = millis();                     // les temps d'interruption sont définis ici pour que le temps d'échantillonnage soit le même pour les deux moteurs
-  echActuelInterruptionG = millis();
 
-  echDelta = (double)echActuel - echPrecedent;           // delta de la mesure
-  if (echDelta >= k)                                     // On s'assure ici que la mesure fait au moins 10 millisecondes
-  {
-    echDeltaInterruptionD = echActuelInterruptionD - echPrecedentInterruptionD; // on définit les deux delta d'interruption
-    echDeltaInterruptionG = echActuelInterruptionG - echPrecedentInterruptionG;
+    echActuel = millis();                                  // Temps de la mesure
+    echActuelInterruptionD = millis();                     // les temps d'interruption sont définis ici pour que le temps d'échantillonnage soit le même pour les deux moteurs
+    echActuelInterruptionG = millis();
 
-    if (echDeltaInterruptionD >= 200 * incertitude)    // On vérifie que le moteur est à l'arrêt
+    echDelta = (double)echActuel - echPrecedent;           // delta de la mesure
+    if (echDelta >= k)                                     // On s'assure ici que la mesure fait au moins 10 millisecondes
     {
-      frequenceD = 0;                                // 40 mS est le temps maximum que prend un tick à la vitesse du moteur la plus basse
+      echDeltaInterruptionD = echActuelInterruptionD - echPrecedentInterruptionD; // on définit les deux delta d'interruption
+      echDeltaInterruptionG = echActuelInterruptionG - echPrecedentInterruptionG;
+
+      if (echDeltaInterruptionD >= 200 * incertitude)    // On vérifie que le moteur est à l'arrêt
+      {
+        frequenceD = 0;                                // 40 mS est le temps maximum que prend un tick à la vitesse du moteur la plus basse
+      }
+      if (echDeltaInterruptionG >= 200 * incertitude)
+      {
+        frequenceG = 0;
+      }
+
+      Wd = incertitude * ((2 * PI) / nbDeTicks) * frequenceD; // vitesse angulaire en rad/s
+      Vd = Wd * (diametre / 2);                               // vitesse linéraire en cm/s
+      Wg = incertitude * ((2 * PI) / nbDeTicks) * frequenceG;
+      Vg = Wg * (diametre / 2);
+
+      odometrie();
+
+      Serial.print(x);
+      Serial.print(" ");
+      Serial.println(y);
+      echPrecedent = echActuel;
     }
-    if (echDeltaInterruptionG >= 200 * incertitude)
-    {
-      frequenceG = 0;
-    }
-
-    Wd = incertitude * ((2 * PI) / nbDeTicks) * frequenceD; // vitesse angulaire en rad/s
-    Vd = Wd * (diametre / 2);                               // vitesse linéraire en cm/s
-    Wg = incertitude * ((2 * PI) / nbDeTicks) * frequenceG;
-    Vg = Wg * (diametre / 2);
-
-    odometrie();
-
-    Serial.print(x);
-    Serial.print(" ");
-    Serial.println(y);
-    echPrecedent = echActuel;
   }
 }
 
