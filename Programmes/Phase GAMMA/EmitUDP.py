@@ -1,6 +1,6 @@
 import socket
 
-UDP_IP = "127.0.0.1" # "127.0.0.1" = loopback, par ailleurs on ne peut pas broadcast
+UDP_IP = "172.21.72.223" # "127.0.0.1" = loopback (pour ce l'envoyer à nous même), par ailleurs on ne peut pas broadcast
 UDP_PORT = 5005
 MESSAGE = "1,2,3"
 
