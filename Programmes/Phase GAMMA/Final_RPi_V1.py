@@ -20,7 +20,7 @@ HTML="""
 """
 
 channel = 1
-address = 0x11 # Adress of the slave(s)
+address_slave1 = 0x11 # Adress of the slave(s)
 bus = smbus.SMBus(channel) # Initialize I2C (SMBus)
 
 s = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -40,14 +40,14 @@ def StringToBytes(val):
                 retVal.append(ord(c))
         return retVal
 
-def writeData(value):
+def writeData(value, address_I2C = 0x11):
         byteValue = StringToBytes(value)
-        bus.write_i2c_block_data(address,0x00,byteValue)
+        bus.write_i2c_block_data(address_I2C,0x00,byteValue)
         return -1
 
 def Unwrap(message):
     newMess = str(message[0])
-    newMess = newMess[1:].strip("'").split(",")
+    newMess = newMess[1:].strip("'")
     return newMess
 
 # Les Threads 
@@ -56,8 +56,7 @@ def Move_Order(): # Thread 1
     while True:
         if connectPS4 :
             recept = Unwrap(s.recvfrom(1024))
-            print(recept)
-            writeData("hello")
+            writeData(recept,address_slave1)
             time.sleep(200*(10**(-6)))
         else :
              time.sleep(3)
