@@ -3,9 +3,9 @@ import socket
 import threading
 import time
 
-UDP_IP = "172.21.72.182" # "127.0.0.1" = loopback (pour ce l'envoyer à nous même), par ailleurs on ne peut pas broadcast
+UDP_IP = "192.168.1.68" # "127.0.0.1" = loopback (pour ce l'envoyer à nous même), par ailleurs on ne peut pas broadcast
 UDP_PORT = 5005
-MESSAGE = "1,2,3"
+MESSAGE = ""
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -65,22 +65,20 @@ class MyController(Controller):
     def on_L3_up(self, value):
         value = abs(Mapping(value,MAX))
         if value >= dead :
-            MESSAGE = str("M") +str(value) + "," + str("L") + "," + str("A")
+            MESSAGE = str("M,") +str(value) + "," + str("L") + "," + str("A")
             sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
         time.sleep(delay)
             
     def on_L3_down(self, value):
         value = Mapping(value,MAX)
         if value >= dead :
-            MESSAGE = str("M") + str(value) + "," + str("L") + "," + str("R")
+            MESSAGE = str("M,") + str(value) + "," + str("L") + "," + str("R")
             sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
         time.sleep(delay)
 
     def on_L3_y_at_rest(self):
-        MESSAGE = str("M") +str(0) + "," + str("L")
+        MESSAGE = str("M,") +str(0) + "," + str("L")
         sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
-
-
 
     def on_L3_press(self):
         """L3 joystick is clicked. This event is only detected when connecting without ds4drv"""
@@ -89,19 +87,19 @@ class MyController(Controller):
     def on_R3_up(self, value):
         value = abs(Mapping(value,MAX))
         if value >= dead :
-            MESSAGE = str("M") +str(value) + "," + str("R") + "," + str("A")
+            MESSAGE = str("M,") +str(value) + "," + str("R") + "," + str("A")
             sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
         time.sleep(delay)
 
     def on_R3_down(self, value):
         value = Mapping(value,MAX)
         if value >= dead :
-            MESSAGE = str("M") +str(value) + "," + str("R") + "," + str("R")
+            MESSAGE = str("M,") +str(value) + "," + str("R") + "," + str("R")
             sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
         time.sleep(delay)
 
     def on_R3_y_at_rest(self):
-        MESSAGE = str("M") +str(0) + "," + str("R")
+        MESSAGE = str("M,") +str(0) + "," + str("R")
         sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT)) 
 
     def on_R3_press(self):
