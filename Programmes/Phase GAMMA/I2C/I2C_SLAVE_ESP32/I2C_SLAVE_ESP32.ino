@@ -17,7 +17,7 @@
 
 */
 
-const int freq = 500;             // Fréquence du PWM
+const int freq = 1000;             // Fréquence du PWM
 const int resolution = 8;        // Resolution (8 octets = 256 valeurs prenables pour le PWM, de 0 à 255)
 
 const int Motor1A = 23;
@@ -53,6 +53,7 @@ void onReceive(int len) {
   {
     temp[j] = temp[j + 1];
   }
+  Serial.println("interruption");
   receiveFlag = true;
 
 }
@@ -97,6 +98,7 @@ void setup()
   ledcAttachPin(Motor3R, 6);
   ledcAttachPin(Motor4A, 7);
   ledcAttachPin(Motor4R, 8);
+  Serial.begin(9600);
 
 }
 
@@ -119,8 +121,12 @@ void MoveValues(String input_str, int& val1, String& val2, String& val3) {
     }
     index++; // incrémente l'index
   }
-  if (input_str.length() > 3) // Sinon c'est qu'on est a pwm = 0 ou Motor Aqua
+  if (input_str.length() > 5) // Sinon c'est qu'on est a pwm = 0 ou Motor Aqua
     val3 = String(temp_str);
+  else
+  {
+    val3 = "N";
+  }
   temp_str = "";
 
 }
@@ -164,7 +170,7 @@ void ButtonAction(String input_str)
 }
 
 void loop() {
-  delay(100);
+  delay(10);
   if (receiveFlag == true)
   {
     String mess = String(temp);
@@ -175,6 +181,7 @@ void loop() {
       {
         if (dir == "A") // Avance
         {
+          Serial.println("LA");
           ledcWrite(1, round(pwm));
           ledcWrite(2, 0);
           ledcWrite(5, round(pwm));
@@ -182,16 +189,29 @@ void loop() {
         }
         else // Recule
         {
-          ledcWrite(1, 0);
-          ledcWrite(2, round(pwm));
-          ledcWrite(5, 0);
-          ledcWrite(6, round(pwm));
+          if (dir == "R")
+          {
+            Serial.println("LR");
+            ledcWrite(1, 0);
+            ledcWrite(2, round(pwm));
+            ledcWrite(5, 0);
+            ledcWrite(6, round(pwm));
+          }
+          else
+          {
+            Serial.println("LS");
+            ledcWrite(1, 0);
+            ledcWrite(2, 0);
+            ledcWrite(5, 0);
+            ledcWrite(6, 0);
+          }
         }
       }
       else
       {
         if (dir == "A") // Avance
         {
+          Serial.println("RA");
           ledcWrite(3, round(pwm));
           ledcWrite(4, 0);
           ledcWrite(7, round(pwm));
@@ -199,19 +219,33 @@ void loop() {
         }
         else // Recule
         {
-          ledcWrite(3, 0);
-          ledcWrite(4, round(pwm));
-          ledcWrite(7, 0);
-          ledcWrite(8, round(pwm));
+          if (dir == "R")
+          {
+            Serial.println("RR");
+            ledcWrite(3, 0);
+            ledcWrite(4, round(pwm));
+            ledcWrite(7, 0);
+            ledcWrite(8, round(pwm));
+          }
+          else
+          {
+            Serial.println("RS");
+            ledcWrite(3, 0);
+            ledcWrite(4, 0);
+            ledcWrite(7, 0);
+            ledcWrite(8, 0);
+          }
         }
       }
+    }
 
-      //On sait dans quelle direction, sur quelle roue et a quelle puissance on va
-    }
-    else
-    {
-      ButtonAction(mess);
-    }
-    receiveFlag = false;
+    //On sait dans quelle direction, sur quelle roue et a quelle puissance on va
+  else
+  {
+    ButtonAction(mess);
   }
+  receiveFlag = false;
+}
+
+
 }
