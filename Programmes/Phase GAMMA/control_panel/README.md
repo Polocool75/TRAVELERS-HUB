@@ -5,6 +5,8 @@ Notamment une authentification, le retour vidéo, la gestion des capteurs, la ge
 
 ## Installation
 
+Attention ! ce tutoriel n'aide pas à installer flutter, il décrit juste les étapes pour créer l'application. Vous ne pourrez donc pas exécuter l'application sans installation.
+
 Pour créer l'app, on commence par créer un nouveau projet flutter :
 
 ```bash
