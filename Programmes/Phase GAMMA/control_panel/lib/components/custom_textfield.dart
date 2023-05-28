@@ -5,16 +5,20 @@ class CustomTextField extends StatelessWidget {
   final String labelText;
   final bool obscureText;
 
-  const CustomTextField(
-      {super.key,
-      required this.controller,
-      required this.labelText,
-      required this.obscureText});
+  const CustomTextField({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+    required this.obscureText,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = screenWidth.toInt() >= 500 ? 500 : 16;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 500),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding.toDouble()),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
@@ -36,3 +40,4 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+

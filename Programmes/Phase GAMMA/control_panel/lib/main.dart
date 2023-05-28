@@ -11,9 +11,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
+      title: 'Travelers Control Panel',
       debugShowCheckedModeBanner: false,
-      home: LoginPage(), //HomePage(),
+      home: LoginPage(),
     );
   }
 }

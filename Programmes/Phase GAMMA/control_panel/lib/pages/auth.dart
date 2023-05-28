@@ -2,6 +2,7 @@ import 'package:control_panel/pages/home.dart';
 import 'package:flutter/material.dart';
 //import 'package:control_panel/components/custom_button.dart';
 import 'package:control_panel/components/custom_textfield.dart';
+
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
@@ -16,7 +17,6 @@ class LoginPage extends StatelessWidget {
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
-      // afficher un message d'erreur
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Nom d\'utilisateur ou mot de passe incorrect')),
@@ -54,6 +54,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 20),
               CustomButton(
                 onTap: () => onSignIn(context),
+                text: 'Se connecter',
               ),
             ],
           ),
@@ -65,8 +66,9 @@ class LoginPage extends StatelessWidget {
 
 class CustomButton extends StatelessWidget {
   final VoidCallback onTap;
+  final String text;
 
-  const CustomButton({required this.onTap});
+  const CustomButton({super.key, required this.onTap, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,7 @@ class CustomButton extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: const Text('Se connecter'),
+        child: Text(text),
       ),
     );
   }

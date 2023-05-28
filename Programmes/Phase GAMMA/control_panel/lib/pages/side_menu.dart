@@ -1,3 +1,4 @@
+import 'package:control_panel/pages/auth.dart';
 import 'package:flutter/material.dart';
 
 class SideMenu extends StatelessWidget {
@@ -28,7 +29,7 @@ class SideMenu extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.home),
-          title: const Text('Home'),
+          title: const Text('Accueil'),
           onTap: () {
             Navigator.pop(context);
           },
@@ -47,7 +48,7 @@ class SideMenu extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.person),
-          title: const Text('About'),
+          title: const Text('À propos'),
           onTap: () {
             Navigator.pop(context);
           },
@@ -62,9 +63,19 @@ class SideMenu extends StatelessWidget {
         const Divider(),
         ListTile(
           leading: const Icon(Icons.settings),
-          title: const Text('Settings'),
+          title: const Text('Réglages'),
           onTap: () {
             Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.logout),
+          title: const Text('Déconnexion'),
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
           },
         ),
       ],
