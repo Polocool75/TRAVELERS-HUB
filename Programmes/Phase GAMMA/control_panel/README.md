@@ -1,16 +1,36 @@
-# control_panel
+# Panneau de contrôle TRAVELERS
 
-A new Flutter project.
+Ceci est le panneau de contrôle du projet. Il permettra à son terme de contrôler les différents aspects du projet.
+Notamment une authentification, le retour vidéo, la gestion des capteurs, la gestion des moteurs, etc.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter application.
+Pour créer l'app, on commence par créer un nouveau projet flutter :
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter create control_panel
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Puis on ajoute le dossier assets dans le dossier control_panel, et on y ajoute les images de l'interface dans un autre dossier img.
+On pourrait alors effectuer la commande :
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+cd control_panel/assets/img/
+```
+
+Puis on ajoute les images dans le dossier img.
+
+On modifie le fichier pubspec.yaml pour ajouter les images en elenvant le # devant assets de manière à obtenir :
+
+```yaml
+  assets:
+    - assets/img/
+```
+
+On peut ensuite modifier l'application via le dossier lib/
+
+Pour exécuter l'application, on exécute :
+
+```bash
+flutter run
+```
