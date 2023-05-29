@@ -1,34 +1,98 @@
-from pyPS4Controller.controller import Controller
 import socket
 import threading
 import time
-import math
+from pyPS4Controller.controller import Controller
 
-UDP_IP = "10.3.141.1" # "127.0.0.1" = loopback (pour ce l'envoyer à nous même), par ailleurs on ne peut pas broadcast
+# UDP variables
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+UDP_IP = "10.3.141.1"  # "127.0.0.1" = loopback (send to yourself)
 UDP_PORT = 5005
 MESSAGE = ""
-valL,valR = 0,0
-oldL, oldR = 0,0
 
-forwardL = True
-forwardR = True
-
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-
+# L-stick value and R-stick value variables
+valL, valR = 0, 0
+oldL, oldR = 0, 0
 MAX = 32767
-dead = 4000
-delay = 30*(10)**(-6)
+DEAD = 4000
+DELAY = 30 * (10) ** (-6)
+
+# Direction of rotation variables
+FORWARD_L = True
+FORWARD_R = True
 
 
-def Mapping(val, oldMax = MAX, newMax = 255) :
-    return int(val * (newMax/oldMax))
+def mapping(val: float, oldMax: float = MAX, newMax: float = 255):
+    """Convert ps4 input value in a PWM readable value (i.e: between 0 and 255)
+
+    Args:
+        val (float): initial PS4 input value\n
+        oldMax (float, optional): initial max value (here 2**15 - 1). Defaults to MAX.\n
+        newMax (float, optional): new max value to fit PWM. Defaults to 255.\n
+
+    Returns:
+        int : the equivalent value between 0 and 255
+    """
+    return int(val * (newMax / oldMax))
+
 
 class MyController(Controller):
-
     def __init__(self, **kwargs):
         Controller.__init__(self, **kwargs)
 
+    def on_square_press(self):
+        global MESSAGE
+        MESSAGE = "B,1"
+        sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
+        time.sleep(DELAY)
+
+    def on_L3_up(self, value):
+        if abs(value) >= DEAD:
+            global valL, FORWARD_L
+            FORWARD_L = True
+            valL = abs(mapping(value))
+        else:
+            valL = 0
+
+    def on_L3_down(self, value):
+        if abs(value) >= DEAD:
+            global valL, FORWARD_L
+            FORWARD_L = False
+            valL = abs(mapping(value))
+        else:
+            valL = 0
+
+    def on_L3_y_at_rest(self):
+        global valL
+        valL = 0
+
+    def on_R3_up(self, value):
+        if abs(value) >= DEAD:
+            global valR, FORWARD_R
+            FORWARD_R = True
+            valR = abs(mapping(value))
+        else:
+            valR = 0
+
+    def on_R3_down(self, value):
+        if abs(value) >= DEAD:
+            global valR, FORWARD_R
+            FORWARD_R = False
+            valR = abs(mapping(value))
+        else:
+            valR = 0
+
+    def on_R3_y_at_rest(self):
+        global valR
+        valR = 0
+
+    def on_L2_press(self, value):
+        print("on_L2_press: {}".format(value))
+
+    def on_R2_press(self, value):
+        print("on_R2_press: {}".format(value))
+
+    # A lot of functions are declared to overwrite them
+    # (We could modify the library to prevent this action)
     def on_x_press(self):
         pass
 
@@ -38,63 +102,11 @@ class MyController(Controller):
     def on_circle_press(self):
         pass
 
-    def on_square_press(self):
-        global MESSAGE
-        MESSAGE = "B,1"
-        sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
-        time.sleep(delay)
-
     def on_L1_press(self):
         pass
 
-    def on_L2_press(self, value):
-        print("on_L2_press: {}".format(value))
-
     def on_R1_press(self):
         pass
-
-    def on_R2_press(self, value):
-        print("on_R2_press: {}".format(value))
-
-    def on_L3_up(self, value):
-        if abs(value) >= dead :
-            global valL,forwardL
-            forwardL=True
-            valL= abs(Mapping(value))
-        else :
-            valL=0
-
-    def on_L3_down(self, value):
-        if abs(value) >= dead :
-            global valL,forwardL
-            forwardL = False
-            valL = abs(Mapping(value))
-        else :
-            valL=0
-
-    def on_L3_y_at_rest(self):
-        global valL
-        valL=0
-
-    def on_R3_up(self, value):
-        if abs(value) >= dead :
-            global valR,forwardR
-            forwardR = True
-            valR = abs(Mapping(value))
-        else :
-            valR=0
-
-    def on_R3_down(self, value):
-        if abs(value) >= dead :
-            global valR,forwardR
-            forwardR = False
-            valR = abs(Mapping(value))
-        else :
-            valR=0
-
-    def on_R3_y_at_rest(self):
-        global valR
-        valR=0
 
     def on_L3_left(self, value):
         pass
@@ -139,9 +151,7 @@ class MyController(Controller):
     def on_playstation_button_release(self):
         """this event is only detected when connecting without ds4drv"""
         print("on_playstation_button_release")
-     
 
-    #Fonctions un peu inutiles
     def on_x_release(self):
         pass
 
@@ -149,7 +159,7 @@ class MyController(Controller):
         pass
 
     def on_circle_release(self):
-        pass 
+        pass
 
     def on_square_release(self):
         pass
@@ -193,17 +203,26 @@ class MyController(Controller):
     def on_share_release(self):
         pass
 
+
 def InputGet():
+    """Open a connection with the PS4 controller. (connecting_using_ds4drv needs to be False)"""
     controller = MyController(interface="/dev/input/js0", connecting_using_ds4drv=False)
     controller.listen()
 
-th_input = threading.Thread(target = InputGet) 
+
+# Create a thread dedicated to collect input values
+th_input = threading.Thread(target=InputGet)
 th_input.start()
 
+# Continously sending readable instructions to Raspberry Pi with the PS4 inputs
 while True:
-    if oldL != valL or oldR!=valR :
-        MESSAGE = str("M,")+str(valL)+","+ (str("A,") if forwardL else str("R,"))+ str(valR) + (str(",A") if forwardR else str(",R"))
+    if oldL != valL or oldR != valR:
+        MESSAGE = str("M,")
+        +str(valL) + ","
+        +(str("A,") if FORWARD_L else str("R,"))
+        +str(valR)
+        +(str(",A") if FORWARD_R else str(",R"))
         oldL = valL
         oldR = valR
         sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
-    time.sleep(delay)
+    time.sleep(DELAY)
