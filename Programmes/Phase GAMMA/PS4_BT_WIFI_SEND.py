@@ -7,24 +7,22 @@ import math
 UDP_IP = "10.3.141.1" # "127.0.0.1" = loopback (pour ce l'envoyer à nous même), par ailleurs on ne peut pas broadcast
 UDP_PORT = 5005
 MESSAGE = ""
+valL,valR = 0,0
+oldL, oldR = 0,0
 
-moveOrder = False
-buttonOrder = False
-forward_right = True
+forwardL = True
+forwardR = True
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 
 MAX = 32767
-dead = 3800
-delay = 50*(10)**(-6)
+dead = 4000
+delay = 30*(10)**(-6)
 
 
 def Mapping(val, oldMax = MAX, newMax = 255) :
     return int(val * (newMax/oldMax))
-
-def NewCoord(x,y) :
-    return math.sqrt(x**2+y**2), math.atan2(y/x)
 
 class MyController(Controller):
 
@@ -41,8 +39,10 @@ class MyController(Controller):
         pass
 
     def on_square_press(self):
+        global MESSAGE
         MESSAGE = "B,1"
-        buttonOrder = True
+        sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
+        time.sleep(delay)
 
     def on_L1_press(self):
         pass
@@ -57,44 +57,53 @@ class MyController(Controller):
         print("on_R2_press: {}".format(value))
 
     def on_L3_up(self, value):
-        value = abs(value)
-        if value >= dead :
-            global valY, moveOrder, forward_right
-            valY = Mapping(value)
-            forward_right = True
-            moveOrder = True
+        if abs(value) >= dead :
+            global valL,forwardL
+            forwardL=True
+            valL= abs(Mapping(value))
+        else :
+            valL=0
 
     def on_L3_down(self, value):
-        value = abs(value)
-        if value >= dead :
-            global valY, moveOrder, forward_right
-            valY = Mapping(value)
-            forward_right = False
-            moveOrder = True
+        if abs(value) >= dead :
+            global valL,forwardL
+            forwardL = False
+            valL = abs(Mapping(value))
+        else :
+            valL=0
 
     def on_L3_y_at_rest(self):
-        global valY
-        valY=0
+        global valL
+        valL=0
+
+    def on_R3_up(self, value):
+        if abs(value) >= dead :
+            global valR,forwardR
+            forwardR = True
+            valR = abs(Mapping(value))
+        else :
+            valR=0
+
+    def on_R3_down(self, value):
+        if abs(value) >= dead :
+            global valR,forwardR
+            forwardR = False
+            valR = abs(Mapping(value))
+        else :
+            valR=0
+
+    def on_R3_y_at_rest(self):
+        global valR
+        valR=0
 
     def on_L3_left(self, value):
-        value = abs(value)
-        if value >= dead :
-            global valX, moveOrder, forward_right
-            valX = Mapping(value)
-            forward_right = False
-            moveOrder = True
+        pass
 
     def on_L3_right(self, value):
-        value = abs(value)
-        if value >= dead :
-            global valX, moveOrder, forward_right
-            valX = Mapping(value)
-            forward_right = True
-            moveOrder = True
+        pass
 
     def on_L3_x_at_rest(self):
-        global valX
-        valX=0
+        pass
 
     def on_L3_press(self):
         """L3 joystick is clicked. This event is only detected when connecting without ds4drv"""
@@ -111,15 +120,6 @@ class MyController(Controller):
 
     def on_right_arrow_press(self):
         print("on_right_arrow_press")
-
-    def on_R3_up(self, value):
-        pass
-
-    def on_R3_down(self, value):
-        pass
-
-    def on_R3_y_at_rest(self):
-        pass
 
     def on_R3_press(self):
         """R3 joystick is clicked. This event is only detected when connecting without ds4drv"""
@@ -172,7 +172,6 @@ class MyController(Controller):
     def on_left_right_arrow_release(self):
         pass
 
-
     def on_L3_release(self):
         pass
 
@@ -202,11 +201,9 @@ th_input = threading.Thread(target = InputGet)
 th_input.start()
 
 while True:
-    if(moveOrder) :
-        speed, dir = NewCoord(valX,valY)
-
-        MESSAGE = str("M,")+str(valL)+
+    if oldL != valL or oldR!=valR :
+        MESSAGE = str("M,")+str(valL)+","+ (str("A,") if forwardL else str("R,"))+ str(valR) + (str(",A") if forwardR else str(",R"))
+        oldL = valL
+        oldR = valR
         sock.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
-
-
-
+    time.sleep(delay)
