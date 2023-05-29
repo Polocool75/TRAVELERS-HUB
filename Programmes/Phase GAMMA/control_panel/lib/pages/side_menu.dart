@@ -1,5 +1,7 @@
 import 'package:control_panel/pages/auth.dart';
+import 'package:control_panel/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({super.key});
@@ -16,7 +18,7 @@ class SideMenu extends StatelessWidget {
           currentAccountPicture: CircleAvatar(
             child: ClipOval(
               child: Image.asset(
-                'img/logo1.jpg',
+                'assets/img/logo1.jpg',
                 fit: BoxFit.cover,
                 width: 90,
                 height: 90,
@@ -31,7 +33,7 @@ class SideMenu extends StatelessWidget {
           leading: const Icon(Icons.home),
           title: const Text('Accueil'),
           onTap: () {
-            Navigator.pop(context);
+            MaterialPageRoute(builder: (context) => const HomePage());
           },
           trailing: ClipOval(
             child: Container(
@@ -50,7 +52,7 @@ class SideMenu extends StatelessWidget {
           leading: const Icon(Icons.person),
           title: const Text('À propos'),
           onTap: () {
-            Navigator.pop(context);
+            launchUrl(Uri.parse('https://www.davincibot.fr'));
           },
         ),
         ListTile(

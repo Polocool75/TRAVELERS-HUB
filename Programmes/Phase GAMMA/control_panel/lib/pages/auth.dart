@@ -1,7 +1,7 @@
 import 'package:control_panel/pages/home.dart';
 import 'package:flutter/material.dart';
-//import 'package:control_panel/components/custom_button.dart';
 import 'package:control_panel/components/custom_textfield.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -32,7 +32,7 @@ class LoginPage extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 50),
-              Image.asset('img/logotype_fond_blanc.png',
+              Image.asset('assets/img/logotype_fond_blanc.png',
                   width: 400, height: 200),
               const Text('Bienvenue sur la plateforme de contrôle de TRAVELERS',
                   style: TextStyle(fontSize: 20)),
@@ -50,7 +50,22 @@ class LoginPage extends StatelessWidget {
                 obscureText: true,
               ),
               const SizedBox(height: 20),
-              const Text('Mot de passe oublié ?'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () =>
+                        launchUrl(Uri.parse('https://github.com/THE-TRAVELERS/TRAVELERS-HUB/blob/master/Programmes/Phase%20GAMMA/control_panel/lib/pages/auth.dart')),
+                    child: const Text(
+                      'Mot de passe oublié ?',
+                      style: TextStyle(
+                        color: Color(0xFF0958EF),
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               CustomButton(
                 onTap: () => onSignIn(context),
