@@ -11,21 +11,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String currentText = 'Activer caméra';
+  String currentText = 'Caméra désactivée';
   bool isStreaming = false;
+  Color currentColor = Colors.red;
 
 
   void toggleStreaming() {
     if (isStreaming) {
       setState(() {
         isStreaming = false;
-        currentText = 'Activer caméra';
+        currentText = 'Caméra désactivée';
+        currentColor = Colors.red;
       });
     } else {
       setState(() {
         isStreaming = true;
-        currentText = 'Désactiver caméra';
-      
+        currentText = 'Caméra activée';
+        currentColor = Colors.green;
       });
     }
   }
@@ -61,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                   child: Image.asset('img/no_img.jpg'),
                 ),
               const SizedBox(height: 50),
-              CustomButton(onTap: toggleStreaming, text: currentText),
+              ButtonSwitch(onTap: toggleStreaming, text: currentText, color: currentColor),
             ],
           ),
         ),

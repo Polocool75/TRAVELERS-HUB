@@ -25,3 +25,45 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+
+
+class ButtonSwitch extends StatelessWidget {
+  final VoidCallback onTap;
+  final String text;
+  final Color color;
+
+  const ButtonSwitch({super.key, required this.onTap, required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      width: 280,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1331F5),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+          textStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(text),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
