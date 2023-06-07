@@ -1,7 +1,11 @@
-import 'package:control_panel/pages/side_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:control_panel/components/custom_button.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:control_panel/pages/side_menu.dart';
+import 'package:control_panel/components/custom_button.dart';
+import 'package:control_panel/components/websocket.dart';
+import 'package:control_panel/constants/constants.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,24 +15,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final WebSocket _socket = WebSocket(Constants.videoWebsocketURL);
   String currentText = 'Caméra désactivée';
   bool isStreaming = false;
-  Color currentColor = Colors.red;
-
 
   void toggleStreaming() {
     if (isStreaming) {
       setState(() {
         isStreaming = false;
         currentText = 'Caméra désactivée';
-        currentColor = Colors.red;
       });
+      _socket.disconnect();
     } else {
       setState(() {
         isStreaming = true;
         currentText = 'Caméra activée';
-        currentColor = Colors.green;
       });
+      _socket.connect();
     }
   }
 
@@ -51,19 +54,40 @@ class _HomePageState extends State<HomePage> {
               ),
               const Divider(),
               const SizedBox(height: 30),
-              if (isStreaming)
-                const SizedBox(
-                  width: 640,
-                  height: 480,
-                ),
-              if (!isStreaming)
-                SizedBox(
-                  width: 640,
-                  height: 480,
-                  child: Image.asset('img/no_img.jpg'),
-                ),
+              isStreaming
+                  ? StreamBuilder(
+                      stream: _socket.stream,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const CircularProgressIndicator();
+                        }
+
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return const Center(
+                            child: Text("Connection Closed !"),
+                          );
+                        }
+                        return Image.memory(
+                          Uint8List.fromList(
+                            base64Decode(
+                              (snapshot.data.toString()),
+                            ),
+                          ),
+                          width: 640,
+                          height: 480,
+                          gaplessPlayback: true,
+                          excludeFromSemantics: true,
+                        );
+                      },
+                    )
+                  : SizedBox(
+                      width: 640,
+                      height: 480,
+                      child: Image.asset('img/no_img.jpg'),
+                    ),
               const SizedBox(height: 50),
-              ButtonSwitch(onTap: toggleStreaming, text: currentText, color: currentColor),
+              ButtonSwitch(
+                  onTap: toggleStreaming, text: currentText, isOn: isStreaming),
             ],
           ),
         ),

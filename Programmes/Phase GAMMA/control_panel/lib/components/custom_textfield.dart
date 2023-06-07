@@ -14,11 +14,9 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = screenWidth.toInt() >= 500 ? 500 : 16;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding.toDouble()),
+    return SizedBox(
+      width: 400,
+      height: 80,
       child: TextField(
         controller: controller,
         obscureText: obscureText,

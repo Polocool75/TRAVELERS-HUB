@@ -26,13 +26,13 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-
 class ButtonSwitch extends StatelessWidget {
   final VoidCallback onTap;
   final String text;
-  final Color color;
+  final bool isOn;
 
-  const ButtonSwitch({super.key, required this.onTap, required this.text, required this.color});
+  const ButtonSwitch(
+      {super.key, required this.onTap, required this.text, required this.isOn});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class ButtonSwitch extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color,
+                color: isOn ? Colors.green : Colors.red,
               ),
             ),
           ],

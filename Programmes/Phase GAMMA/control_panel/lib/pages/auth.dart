@@ -62,7 +62,7 @@ class LoginPage extends StatelessWidget {
                 labelText: 'Identifiant',
                 obscureText: false,
               ),
-              const SizedBox(height: 20),
+              //const SizedBox(height: 20),
               CustomTextField(
                 controller: passwordController,
                 labelText: 'Mot de passe',
