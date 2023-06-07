@@ -1,7 +1,9 @@
-import 'package:control_panel/pages/home.dart';
 import 'package:flutter/material.dart';
-import 'package:control_panel/components/custom_textfield.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'package:control_panel/pages/home.dart';
+import 'package:control_panel/components/custom_button.dart';
+import 'package:control_panel/components/custom_textfield.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -14,12 +16,17 @@ class LoginPage extends StatelessWidget {
         passwordController.text == 'secret') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Nom d\'utilisateur ou mot de passe incorrect')),
+          content: Text(
+            'Veuillez réessayer. Nom d\'utilisateur ou mot de passe incorrect.',
+          ),
+        ),
       );
     }
   }
@@ -32,12 +39,24 @@ class LoginPage extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 50),
-              Image.asset('assets/img/logotype_fond_blanc.png',
-                  width: 400, height: 200),
-              const Text('Bienvenue sur la plateforme de contrôle de TRAVELERS',
-                  style: TextStyle(fontSize: 20)),
-              const Divider(),
-              const SizedBox(height: 50),
+              Image.asset(
+                'assets/img/logotype_fond_blanc.png',
+                width: 400,
+                height: 200,
+              ),
+              const Text(
+                'Bienvenue sur la plateforme de contrôle de TRAVELERS',
+                style: TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 400),
+                child: Divider(
+                  thickness: 0.5,
+                  color: Colors.grey[400],
+                ),
+              ),
+              const SizedBox(height: 40),
               CustomTextField(
                 controller: usernameController,
                 labelText: 'Identifiant',
@@ -54,8 +73,11 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () =>
-                        launchUrl(Uri.parse('https://github.com/THE-TRAVELERS/TRAVELERS-HUB/blob/master/Programmes/Phase%20GAMMA/control_panel/lib/pages/auth.dart')),
+                    onTap: () => launchUrl(
+                      Uri.parse(
+                        'https://github.com/THE-TRAVELERS/TRAVELERS-HUB/blob/master/Programmes/Phase%20GAMMA/control_panel/lib/pages/auth.dart',
+                      ),
+                    ),
                     child: const Text(
                       'Mot de passe oublié ?',
                       style: TextStyle(
@@ -71,35 +93,59 @@ class LoginPage extends StatelessWidget {
                 onTap: () => onSignIn(context),
                 text: 'Se connecter',
               ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 400),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.5,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        'Nos partenaires',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.5,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'img/logo_esilv.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  const SizedBox(width: 20),
+                  Image.asset(
+                    'img/logo_gotronic.png',
+                    width: 150,
+                    height: 100,
+                  ),
+                  const SizedBox(width: 20),
+                  Image.asset(
+                    'img/logo_dvic.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final String text;
-
-  const CustomButton({super.key, required this.onTap, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 500),
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1331F5),
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-          textStyle: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: Text(text),
       ),
     );
   }

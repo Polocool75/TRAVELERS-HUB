@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:control_panel/pages/side_menu.dart';
+import 'package:flutter/material.dart';
+import 'package:control_panel/components/custom_button.dart';
+
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -11,7 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String currentText = 'Activer caméra';
   bool isStreaming = false;
-  String streamFolder = 'assets/lib/vid/';
+
 
   void toggleStreaming() {
     if (isStreaming) {
@@ -23,6 +25,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isStreaming = true;
         currentText = 'Désactiver caméra';
+      
       });
     }
   }
@@ -47,55 +50,21 @@ class _HomePageState extends State<HomePage> {
               const Divider(),
               const SizedBox(height: 30),
               if (isStreaming)
-                SizedBox(
+                const SizedBox(
                   width: 640,
                   height: 480,
-                  child: Expanded(
-                    child: Center(
-                      // PARTIE À CHANGER : afficher les vidéos consécutivement
-                      child: Image.asset('img/vid1.jpg'),
-                      // Balise <video> à utiliser pour afficher la vidéo
-                    ),
-                  ),
                 ),
               if (!isStreaming)
                 SizedBox(
                   width: 640,
                   height: 480,
-                  child: Image.asset(
-                      'img/no_img.jpg'), // Use default image when not streaming
+                  child: Image.asset('img/no_img.jpg'),
                 ),
               const SizedBox(height: 50),
-              CustomButton(onTap: () => toggleStreaming(), text: currentText),
+              CustomButton(onTap: toggleStreaming, text: currentText),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final String text;
-
-  const CustomButton({super.key, required this.onTap, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 500),
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1331F5),
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-          textStyle: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: Text(text),
       ),
     );
   }
