@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Defines a custom textfield to enter an id or a password
 class CustomTextField extends StatelessWidget {
   final dynamic controller;
   final String labelText;

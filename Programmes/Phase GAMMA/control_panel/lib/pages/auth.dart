@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:control_panel/pages/home.dart';
 import 'package:control_panel/components/custom_button.dart';
@@ -40,12 +39,12 @@ class LoginPage extends StatelessWidget {
             children: [
               const SizedBox(height: 50),
               Image.asset(
-                'assets/img/logotype_fond_blanc.png',
+                'img/logotype_noir_vide.png',
                 width: 400,
                 height: 200,
               ),
               const Text(
-                'Bienvenue sur la plateforme de contrôle de TRAVELERS',
+                'Veuillez vous identifier pour accéder au panneau de contrôle.',
                 style: TextStyle(fontSize: 20),
               ),
               const SizedBox(height: 20),
@@ -68,14 +67,16 @@ class LoginPage extends StatelessWidget {
                 labelText: 'Mot de passe',
                 obscureText: true,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () => launchUrl(
-                      Uri.parse(
-                        'https://github.com/THE-TRAVELERS/TRAVELERS-HUB/blob/master/Programmes/Phase%20GAMMA/control_panel/lib/pages/auth.dart',
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'id : admin\npassword : secret',
+                        ),
                       ),
                     ),
                     child: const Text(

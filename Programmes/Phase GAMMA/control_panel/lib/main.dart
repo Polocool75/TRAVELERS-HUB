@@ -14,9 +14,6 @@ class MyApp extends StatelessWidget {
       title: 'Travelers Control Panel',
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
-      theme: ThemeData(
-        iconTheme: const IconThemeData(color: Colors.white),
-      )
     );
   }
 }

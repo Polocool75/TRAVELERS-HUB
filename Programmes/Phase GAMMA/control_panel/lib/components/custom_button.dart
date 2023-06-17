@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Defines a custom button for general purpose
 class CustomButton extends StatelessWidget {
   final VoidCallback onTap;
   final String text;
@@ -26,12 +27,13 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-class ButtonSwitch extends StatelessWidget {
+/// Defines a custom button with a state on or off
+class StateButton extends StatelessWidget { 
   final VoidCallback onTap;
   final String text;
   final bool isOn;
 
-  const ButtonSwitch(
+  const StateButton(
       {super.key, required this.onTap, required this.text, required this.isOn});
 
   @override

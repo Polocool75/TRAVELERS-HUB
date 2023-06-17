@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:control_panel/constants/constants.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/status.dart' as status;
 
+/// Defines a custom websocket for the video flux
 class WebSocket {
   // ------------------------- Members ------------------------- //
   late String url;
@@ -33,13 +34,13 @@ class WebSocket {
 
   /// Connects the current application to a websocket
   void connect() async {
-    _channel = WebSocketChannel.connect(Uri.parse("ws://10.3.141.1:9000"));
+    _channel = WebSocketChannel.connect(Uri.parse(Constants.videoWebsocketURL));
   }
 
   /// Disconnects the current application from a websocket
   void disconnect() {
     if (_channel != null) {
-      _channel!.sink.close(status.goingAway);
+      _channel!.sink.close();
     }
   }
 }
