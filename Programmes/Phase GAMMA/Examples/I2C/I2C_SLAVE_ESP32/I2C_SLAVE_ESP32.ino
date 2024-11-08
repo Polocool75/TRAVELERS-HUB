@@ -4,17 +4,14 @@
 
 /* Structure des messages I2C (String):
     "[1],[2],[3],[4]"
-
-   Pour se déplacer Terrestre / Aquatique:
+  Pour se déplacer Terrestre / Aquatique:
     [1] : "M" / "A" -> Terrestre / Aquatique
     [2] : int() -> Valeurs du PWM ([0,255])
     [3] : "L" ou "R" -> Moteurs gauche (L) ou droit (R)
     [4] : "A" ou "R" -> Sens avant (A) ou arrière (R)
-
-   Boutons :
+  Boutons :
     [1] : "B" -> Boutons
     [2] : "1", "2", "3", "4", "5" -> Carré, Triangle, Rond, Croix, Start
-
 */
 
 const int freq = 1000;             // Fréquence du PWM
@@ -37,8 +34,8 @@ bool carre = false;
 
 volatile boolean receiveFlag = false;
 char temp[32];
-int pwm;
-String wheel, dir;
+int gauche, droite;
+String dir;
 
 void onRequest() {
 }
@@ -82,9 +79,7 @@ void setup()
        Tout d'abord créer un "programme pré-enregistré" avec ledcSetup([numéro du programme (1 à 16)],[fq du PWM], [résolution du PWM])
        Ensuite, on "attache" un pin à un programme avec ledcAttachPin([pin],[numéro du programme])
        Attention, on ne peut pas attacher plusieurs pins à un même programme (ici, on a donc du créer 12 programmes différents ayant les mêmes caractéristiques)
-
        Enfin, pour utiliser le PWM, on utiliser ledcWrite([numéro du programme],[valeur du PWM])
-
     */
     ledcSetup(i, freq, resolution);                    // Tous les programmes/channels de 1 à 12 auront donc comme fq 500hz et 8 de résolution
   }
@@ -102,7 +97,7 @@ void setup()
 
 }
 
-void MoveValues(String input_str, int& val1, String& val2, String& val3) {
+void MoveValues(String input_str, int& val1, int& val2, String& val3) {
   int index = 2; // initialise l'index à 2 pour pas compter M
   String temp_str = ""; // initialise la chaîne temporaire
   int count = 0; // initialise le compteur de valeurs
@@ -110,13 +105,15 @@ void MoveValues(String input_str, int& val1, String& val2, String& val3) {
     char current_char = input_str.charAt(index); // récupère le caractère actuel
     if (current_char == ',') { // si c'est une virgule
       count++; // incrémente le compteur de valeurs
-      if (count == 1) { // si c'est la première valeur
+      if (count == 1) { // si c'est la première valeur/deuxième virgule
         val1 = temp_str.toInt(); // convertit la chaîne en entier et l'assigne à la première valeur
-      } else if (count == 2) { // si c'est la deuxième valeur
-        val2 = String(temp_str); // convertit la chaîne en entier et l'assigne à la deuxième valeur
+      } 
+      else if (count == 2) { // si c'est la deuxième valeur/3eme Virgule
+        val2 = temp_str.toInt(); // convertit la chaîne en entier et l'assigne à la deuxième valeur                     
       }
       temp_str = ""; // réinitialise la chaîne temporaire
-    } else { // si ce n'est pas une virgule
+    } 
+    else { // si ce n'est pas une virgule
       temp_str += current_char; // ajoute le caractère à la chaîne temporaire
     }
     index++; // incrémente l'index
@@ -171,20 +168,18 @@ void ButtonAction(String input_str)
 
 void loop() {
   delay(10);
+  String mess = String(temp);
   if (receiveFlag == true)
   {
-    String mess = String(temp);
     if (mess.charAt(0) == 'M' || mess.charAt(0) == 'A')
     {
-      MoveValues(mess, pwm, wheel, dir);
-      if (wheel == "L") // Roue de gauche
-      {
+      MoveValues(mess, gauche, droite, dir);
         if (dir == "A") // Avance
         {
           Serial.println("LA");
-          ledcWrite(1, round(pwm));
+          ledcWrite(1, round(gauche));
           ledcWrite(2, 0);
-          ledcWrite(5, round(pwm));
+          ledcWrite(5, round(gauche));
           ledcWrite(6, 0);
         }
         else // Recule
@@ -193,9 +188,9 @@ void loop() {
           {
             Serial.println("LR");
             ledcWrite(1, 0);
-            ledcWrite(2, round(pwm));
+            ledcWrite(2, round(gauche));
             ledcWrite(5, 0);
-            ledcWrite(6, round(pwm));
+            ledcWrite(6, round(gauche));
           }
           else
           {
@@ -206,15 +201,13 @@ void loop() {
             ledcWrite(6, 0);
           }
         }
-      }
-      else
-      {
+      
         if (dir == "A") // Avance
         {
           Serial.println("RA");
-          ledcWrite(3, round(pwm));
+          ledcWrite(3, round(droite));
           ledcWrite(4, 0);
-          ledcWrite(7, round(pwm));
+          ledcWrite(7, round(droite));
           ledcWrite(8, 0);
         }
         else // Recule
@@ -223,9 +216,9 @@ void loop() {
           {
             Serial.println("RR");
             ledcWrite(3, 0);
-            ledcWrite(4, round(pwm));
+            ledcWrite(4, round(droite));
             ledcWrite(7, 0);
-            ledcWrite(8, round(pwm));
+            ledcWrite(8, round(droite));
           }
           else
           {
@@ -245,7 +238,4 @@ void loop() {
     ButtonAction(mess);
   }
   receiveFlag = false;
-}
-
-
 }
